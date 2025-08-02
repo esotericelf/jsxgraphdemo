@@ -1,4 +1,4 @@
-var board = JXG.JSXGraph.initBoard('box', { boundingbox: [-10, 10, 10, -10], grid: false, axis: false, keepaspectratio: true, showcopyright: false, shownavigation: false });
+// var board = JXG.JSXGraph.initBoard('box', { boundingbox: [-10, 10, 10, -10], grid: false, axis: false, keepaspectratio: true, showcopyright: false, shownavigation: false });
 
 
 //x-coordinates, y-coordinates and n is the name
@@ -18,7 +18,7 @@ const createLine = (p, q, n) => {
 
 //p, q are two points objects and n is the name
 const createSegment = (p, q, n) => {
-  return board.create('line', [p, q], { strokeColor: '#00ff00', strokeWidth: 2, color: '#6CD850', name: n })
+  return board.create('segment', [p, q], { strokeColor: '#00ff00', strokeWidth: 2, color: '#6CD850', name: n })
 }
 
 
@@ -122,13 +122,20 @@ const checkboxEvent = (cb,fx)=> {
   JXG.addEvent(cb.rendNodeCheckbox, 'change', fx, cb);  
 }
 
+/**
+ * Creates a polygon with variable number of points (minimum 3)
+ * @param {Array} points - Array of point coordinates [[x1,y1], [x2,y2], ...]
+ * @param {Object} attributes - JSXGraph attributes for the polygon
+ */
+const createPolygon = (points, attributes = {}) => {
+    if (points.length < 3) {
+        throw new Error("Polygon requires at least 3 points");
+    }
 
-var c=[], l=[], p=[];
-p.push(createFixPoint(1,0,'A'));
-p.push(createFixPoint(2,3,'B'));
-l.push(createLine(p[0],p[1],'l'));
-c.push(createCircle(p[0],8));
-p.push(lineCircleIntersection(l[0],c[0],0,'C'));
-
-
-
+    return board.create('polygon', points, {
+        borders: { strokeColor: 'blue', strokeWidth: 2 },  // Default border
+        vertices: { visible: false },                      // Hide vertices
+        fillOpacity: 0.5,                                 // Default opacity
+        ...attributes                                     // User args OVERRIDE defaults
+    });
+};

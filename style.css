@@ -2,3 +2,9 @@ html, body {
   height: 100%;
   width: 100%;
 }
+#drawingCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid black; /* Optional: Add a border for visibility */
+}
