@@ -27,4 +27,3 @@ const yAxis = board.create('axis', [[0, 0], [0, 1]], {
 const l1= createLine([0,32],[2,0],'l_1')
 const p1=createFixPoint(2,0,'2')
 const p2=createFixPoint(0,32,'32')
-

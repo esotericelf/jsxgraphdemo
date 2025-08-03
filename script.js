@@ -73,8 +73,14 @@ const coordinatesLabel = (p, offset, fs, mj) => {
 }
 
 //p, q are points objects, h is the height of the bezier curve, showlenght is a boolean, dp stands for display decimal places 
-const segmentLabel = (p, q, h, showlength, dp) => {
-  var crl = board.create('curve', [[0], [0]], { strokeWidth: 1, strokeColor: 'black' });
+const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
+  // Create curve (hidden initially if visible is false)
+  var crl = board.create('curve', [[0], [0]], { 
+    strokeWidth: 1, 
+    strokeColor: 'black',
+    visible: visible // Set initial visibility
+  });
+
   crl.bezierDegree = 3;
   crl.updateDataArray = function() {
     var d = [p.X() - q.X(), p.Y() - q.Y()],
@@ -87,8 +93,9 @@ const segmentLabel = (p, q, h, showlength, dp) => {
     this.dataX = [q.X(), q.X() - d[1], mid[0], mid[0] - d[1], mid[0], p.X() - d[1], p.X()];
     this.dataY = [q.Y(), q.Y() + d[0], mid[1], mid[1] + d[0], mid[1], p.Y() + d[0], p.Y()];
   };
-  // Text
-  return board.create('text', [
+
+  // Create text (hidden initially if visible is false)
+  const text = board.create('text', [
     function() {
       var d = [p.X() - q.X(), p.Y() - q.Y()],
         dl = Math.sqrt(d[0] * d[0] + d[1] * d[1]),
@@ -106,15 +113,33 @@ const segmentLabel = (p, q, h, showlength, dp) => {
       return mid + d[0] + 0.1;
     },
     function() {
+      if (!visible) return ''; // Return empty if not visible
       if (showlength) { return '$$' + p.Dist(q).toFixed(2) + '$$'; }
-      else { return '$$' + p.name + q.name + '$$' }
+      else if (showlabel) { return '$$' + p.name + q.name + '$$'; }
+      else { return ''; }
     }
-  ], { fontSize: 16, useMathJax: true });
+  ], { 
+    fontSize: 16, 
+    useMathJax: true,
+    visible: visible // Set initial visibility
+  });
+
+  // Return both elements with a method to toggle visibility
+  return {
+    curve: crl,
+    text: text,
+    setVisible: (state) => {
+      crl.setAttribute({visible: state});
+      text.setAttribute({visible: state});
+      if (!state) text.setText(''); // Clear text when hiding
+      board.update();
+    }
+  };
 }
 
 //x and y are coordinates where the checkbox should appear and tx is the descriptive text
 const createCheckbox = (x,y,tx)=>{
-  return board.create('checkbox', [x, y, tx])
+  return board.create('checkbox', [x, y, tx], { fixed: true })
 }
 
 //cb is the checkbox object and fx is the function object pertaining to the change specified

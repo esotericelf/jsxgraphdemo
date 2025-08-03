@@ -77,6 +77,17 @@ const triangle = createPolygon([B, H, M], {
     fillColor: '#F54927', fillOpacity:0.6
 });
 
-const txt = createText(1, -0.5, '4cm^2', 12, true)    
+const txt = createText(-0.5, 1.5, '4cm^2', 12, true)   
 
-board.update();
+
+const triangle_2 = createPolygon([C,F,G], {
+    fillColor: '#C4BF39', fillOpacity:0.6
+});
+
+const triangle_3 = createPolygon([G,D,E], {
+    fillColor: '#C4BF39', fillOpacity:0.6
+});
+
+const txt4 = createText((C.X()+F.X())/2, (C.Y()+G.Y())/2, '5cm^2', 12, true)   
+
+const txt5 = createText((E.X()+D.X())/2, (D.Y()+G.Y())/2, '5cm^2', 12, true)   
