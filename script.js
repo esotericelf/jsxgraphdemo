@@ -24,19 +24,19 @@ const createSegment = (p, q, n) => {
 
 // p , q , r are points objects, n is name in text
 const createPerpendicular = (p, q, r, n) => {
-  var a = createLine(q,r,n)
-  a.setAttribute({visible:false})
+  var a = createLine(q, r, n)
+  a.setAttribute({ visible: false })
   return board.create('perpendicular', [a, p], { strokeColor: '#00ff00', strokeWidth: 2, color: '#6CD850', name: n })
 }
 
 //l_1, l_2 are two lines object and n is the name
-const linesIntersection = (l_1,l_2,n) => {
+const linesIntersection = (l_1, l_2, n) => {
   return board.create('intersection', [l_1, l_2], { fixed: true, size: 2, color: '#000000', name: n })
 }
 
 
-const lineCircleIntersection = (l_1,l_2,pos,n) => {
-  return board.create('intersection', [l_1, l_2,pos], { fixed: true, size: 2, color: '#000000', name: n })
+const lineCircleIntersection = (l_1, l_2, pos, n) => {
+  return board.create('intersection', [l_1, l_2, pos], { fixed: true, size: 2, color: '#000000', name: n })
 }
 
 //o is the centre which is a point object, r is an integer (radius), n is the name
@@ -47,7 +47,7 @@ const createCircle = (o, r, n) => {
 //p,q,r are three points object and n is the name, if showangle is true, value is displayed instead of angle
 const createAngle = (p, q, r, n, showangle) => {
   return board.create('nonreflexangle', [p, q, r], {
-    strokeColor: '#00ff00', strokeWidth: 1, radius: 0.5, color: '#F5479E', fillOpacity: 0.5, name: function() {
+    strokeColor: '#00ff00', strokeWidth: 1, radius: 0.5, color: '#F5479E', fillOpacity: 0.5, name: function () {
       if (showangle) {
         if (JXG.Math.Geometry.trueAngle(p, q, r) > 180) { return 360 - JXG.Math.Geometry.trueAngle(p, q, r).toFixed(0) + '°'; }
         else { return JXG.Math.Geometry.trueAngle(p, q, r).toFixed(0) + '°'; }
@@ -72,17 +72,17 @@ const coordinatesLabel = (p, offset, fs, mj) => {
   return board.create('text', [p.X() + offset, p.Y() + offset, p.name + "(" + p.X() + "," + p.Y() + ")"]), { useMathJax: mj, fontSize: fs }
 }
 
-//p, q are points objects, h is the height of the bezier curve, showlenght is a boolean, dp stands for display decimal places 
+//p, q are points objects, h is the height of the bezier curve, showlenght is a boolean, dp stands for display decimal places
 const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
   // Create curve (hidden initially if visible is false)
-  var crl = board.create('curve', [[0], [0]], { 
-    strokeWidth: 1, 
+  var crl = board.create('curve', [[0], [0]], {
+    strokeWidth: 1,
     strokeColor: 'black',
     visible: visible // Set initial visibility
   });
 
   crl.bezierDegree = 3;
-  crl.updateDataArray = function() {
+  crl.updateDataArray = function () {
     var d = [p.X() - q.X(), p.Y() - q.Y()],
       dl = Math.sqrt(d[0] * d[0] + d[1] * d[1]),
       mid = [(q.X() + p.X()) * 0.5, (q.Y() + p.Y()) * 0.5];
@@ -96,7 +96,7 @@ const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
 
   // Create text (hidden initially if visible is false)
   const text = board.create('text', [
-    function() {
+    function () {
       var d = [p.X() - q.X(), p.Y() - q.Y()],
         dl = Math.sqrt(d[0] * d[0] + d[1] * d[1]),
         mid = (q.X() + p.X()) * 0.5;
@@ -104,7 +104,7 @@ const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
       d[1] *= h / dl;
       return mid - d[1] + 0.1;
     },
-    function() {
+    function () {
       var d = [p.X() - q.X(), p.Y() - q.Y()],
         dl = Math.sqrt(d[0] * d[0] + d[1] * d[1]),
         mid = (q.Y() + p.Y()) * 0.5;
@@ -112,14 +112,14 @@ const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
       d[0] *= h / dl;
       return mid + d[0] + 0.1;
     },
-    function() {
+    function () {
       if (!visible) return ''; // Return empty if not visible
       if (showlength) { return '$$' + p.Dist(q).toFixed(2) + '$$'; }
       else if (showlabel) { return '$$' + p.name + q.name + '$$'; }
       else { return ''; }
     }
-  ], { 
-    fontSize: 16, 
+  ], {
+    fontSize: 16,
     useMathJax: true,
     visible: visible // Set initial visibility
   });
@@ -129,8 +129,8 @@ const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
     curve: crl,
     text: text,
     setVisible: (state) => {
-      crl.setAttribute({visible: state});
-      text.setAttribute({visible: state});
+      crl.setAttribute({ visible: state });
+      text.setAttribute({ visible: state });
       if (!state) text.setText(''); // Clear text when hiding
       board.update();
     }
@@ -138,13 +138,13 @@ const segmentLabel = (p, q, h, showlength, showlabel, dp, visible = true) => {
 }
 
 //x and y are coordinates where the checkbox should appear and tx is the descriptive text
-const createCheckbox = (x,y,tx)=>{
+const createCheckbox = (x, y, tx) => {
   return board.create('checkbox', [x, y, tx], { fixed: true })
 }
 
 //cb is the checkbox object and fx is the function object pertaining to the change specified
-const checkboxEvent = (cb,fx)=> {
-  JXG.addEvent(cb.rendNodeCheckbox, 'change', fx, cb);  
+const checkboxEvent = (cb, fx) => {
+  JXG.addEvent(cb.rendNodeCheckbox, 'change', fx, cb);
 }
 
 /**
@@ -153,14 +153,198 @@ const checkboxEvent = (cb,fx)=> {
  * @param {Object} attributes - JSXGraph attributes for the polygon
  */
 const createPolygon = (points, attributes = {}) => {
-    if (points.length < 3) {
-        throw new Error("Polygon requires at least 3 points");
-    }
+  if (points.length < 3) {
+    throw new Error("Polygon requires at least 3 points");
+  }
 
-    return board.create('polygon', points, {
-        borders: { strokeColor: 'blue', strokeWidth: 2 },  // Default border
-        vertices: { visible: false },                      // Hide vertices
-        fillOpacity: 0.5,                                 // Default opacity
-        ...attributes                                     // User args OVERRIDE defaults
-    });
+  return board.create('polygon', points, {
+    borders: { strokeColor: 'blue', strokeWidth: 2 },  // Default border
+    vertices: { visible: false },                      // Hide vertices
+    fillOpacity: 0.5,                                 // Default opacity
+    ...attributes                                     // User args OVERRIDE defaults
+  });
+};
+
+/**
+ * Creates the base square setup for 2024_II_17 problems
+ * @param {Object} options - Configuration options
+ * @returns {Object} - All created elements
+ */
+const createBaseSquare2024_II_17 = (options = {}) => {
+  const {
+    boundingbox = [-2, 10, 14, -2],
+    squareSize = 8,
+    squareX = 0,
+    squareY = 0
+  } = options;
+
+  // Initialize board
+  const board = JXG.JSXGraph.initBoard('box', {
+    boundingbox: boundingbox,
+    axis: false,
+    keepaspectratio: true,
+    showcopyright: false,
+    shownavigation: false
+  });
+
+  // 1. Square points (A→B→C→D→A anticlockwise)
+  const A = createFixPoint(squareX, squareY + squareSize, 'A');  // Top-left
+  const B = createFixPoint(squareX, squareY, 'B');              // Bottom-left
+  const C = createFixPoint(squareX + squareSize, squareY, 'C'); // Bottom-right
+  const D = createFixPoint(squareX + squareSize, squareY + squareSize, 'D'); // Top-right
+
+  // 2. Square sides
+  const AB = createSegment(A, B, 'AB');
+  const BC = createSegment(B, C, 'BC');
+  const CD = createSegment(C, D, 'CD');
+  const DA = createSegment(D, A, 'DA');
+
+  // 3. M = Midpoint of BC
+  const M = board.create('midpoint', [B, C], {
+    name: 'M',
+    size: 2,
+    color: '#3D5787',
+    fixed: true
+  });
+
+  // 4. E divides AD in 3:1 (AE:ED = 3:1)
+  const E = board.create('point', [
+    () => A.X() + (D.X() - A.X()) * 3 / 4,
+    () => A.Y() + (D.Y() - A.Y()) * 3 / 4
+  ], {
+    name: 'E',
+    size: 2,
+    color: '#3D5787',
+    fixed: true
+  });
+
+  // 5. F point (distance from M equal to A to E)
+  const F = board.create('point', [
+    () => M.X() + A.Dist(E),
+    () => M.Y()
+  ], {
+    name: 'F',
+    size: 2,
+    color: '#3D5787',
+    fixed: true
+  });
+
+  // 6. AM segment
+  const AM = createSegment(A, M, 'AM');
+
+  // 7. EF segment
+  const EF = createSegment(E, F, 'EF');
+
+  // 8. BF segment
+  const BF = createSegment(B, F, 'BF');
+
+  // 9. G = CD ∩ EF
+  const G = board.create('intersection', [CD, EF, 0], {
+    name: 'G',
+    size: 2,
+    color: '#3D5787'
+  });
+
+  // 10. BG segment
+  const BG = createSegment(B, G, 'BG');
+
+  // 11. H = AM ∩ BG
+  const H = board.create('intersection', [AM, BG, 0], {
+    name: 'H',
+    size: 2,
+    color: '#3D5787'
+  });
+
+  // 12. Base triangle BHM
+  const triangle = createPolygon([B, H, M], {
+    fillColor: '#F54927',
+    fillOpacity: 0.6
+  });
+
+  return {
+    board,
+    points: { A, B, C, D, M, E, F, G, H },
+    segments: { AB, BC, CD, DA, AM, EF, BF, BG },
+    triangle
+  };
+};
+
+/**
+ * Creates text elements based on configuration
+ * @param {Array} textConfigs - Array of text configurations
+ * @returns {Array} - Array of created text elements
+ */
+const createTextElements = (textConfigs) => {
+  return textConfigs.map(config => {
+    const { x, y, content, fontSize = 12, useMathJax = true } = config;
+    return createText(x, y, content, fontSize, useMathJax);
+  });
+};
+
+/**
+ * Creates segment labels based on configuration
+ * @param {Array} labelConfigs - Array of label configurations
+ * @returns {Array} - Array of created label objects
+ */
+const createSegmentLabels = (labelConfigs) => {
+  return labelConfigs.map(config => {
+    const { point1, point2, height = 0.5, showLength = false, showLabel = false, decimalPlaces = 0, visible = true } = config;
+    return segmentLabel(point1, point2, height, showLength, showLabel, decimalPlaces, visible);
+  });
+};
+
+/**
+ * Creates additional polygons based on configuration
+ * @param {Array} polygonConfigs - Array of polygon configurations
+ * @returns {Array} - Array of created polygon elements
+ */
+const createAdditionalPolygons = (polygonConfigs) => {
+  return polygonConfigs.map(config => {
+    const { points, attributes = {} } = config;
+    return createPolygon(points, attributes);
+  });
+};
+
+/**
+ * Complete setup for 2024_II_17 problems with all customizations
+ * @param {Object} config - Complete configuration object
+ * @returns {Object} - All created elements
+ */
+const setup2024_II_17 = (config = {}) => {
+  const {
+    baseOptions = {},
+    texts = [],
+    segmentLabels = [],
+    additionalPolygons = [],
+    baseTriangleText = { x: -0.5, y: 1.5, content: '4cm^2' }
+  } = config;
+
+  // Create base square setup
+  const baseElements = createBaseSquare2024_II_17(baseOptions);
+
+  // Create base triangle text
+  const baseTriangleTextElement = createText(
+    baseTriangleText.x,
+    baseTriangleText.y,
+    baseTriangleText.content,
+    baseTriangleText.fontSize || 12,
+    baseTriangleText.useMathJax !== false
+  );
+
+  // Create additional text elements
+  const textElements = createTextElements(texts);
+
+  // Create segment labels
+  const labelElements = createSegmentLabels(segmentLabels);
+
+  // Create additional polygons
+  const polygonElements = createAdditionalPolygons(additionalPolygons);
+
+  return {
+    ...baseElements,
+    baseTriangleTextElement,
+    textElements,
+    labelElements,
+    polygonElements
+  };
 };
