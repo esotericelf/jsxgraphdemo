@@ -3,7 +3,20 @@
 ## Overview
 The repetitive code in the 2024_II_17_X files has been refactored to use a centralized setup system. This reduces code duplication and makes it easier to create new variations.
 
-## New Functions Added to script.js
+## File Structure
+
+### `script.js` (Global)
+Contains all the general-purpose JSXGraph utility functions that can be reused across different problems.
+
+### `2024_II_17_utils.js` (Specific)
+Contains functions specific to the 2024_II_17 problem series:
+- `createBaseSquare2024_II_17()`
+- `setup2024_II_17()`
+- `createTextElements()`
+- `createSegmentLabels()`
+- `createAdditionalPolygons()`
+
+## New Functions in 2024_II_17_utils.js
 
 ### 1. `createBaseSquare2024_II_17(options)`
 Creates the base square setup with all common elements:
@@ -36,6 +49,11 @@ Complete setup function that creates the base square and handles all customizati
 
 ### Step 1: Create HTML File
 Copy `template_2024_II_17.html` and replace `SCRIPT_FILE_PLACEHOLDER` with your JS file name.
+
+**Required Scripts (in order):**
+1. `../script.js` - Global utility functions
+2. `2024_II_17_utils.js` - 2024_II_17 specific functions
+3. Your specific JS file
 
 ### Step 2: Create JS File
 Use the `setup2024_II_17()` function as the base and add your customizations:
@@ -103,7 +121,8 @@ const trapezium = createPolygon([elements.points.H, elements.points.M, elements.
 2. **Easier Maintenance**: Changes to base structure only need to be made in one place
 3. **Consistent Structure**: All files follow the same pattern
 4. **Faster Development**: New variations can be created quickly
-5. **Better Organization**: Clear separation between base setup and customizations
+5. **Better Organization**: Clear separation between global and specific functions
+6. **Modular Design**: 2024_II_17 specific functions are isolated from global utilities
 
 ## Available Points and Elements
 
@@ -121,3 +140,12 @@ After calling `setup2024_II_17()`, you have access to:
 **Base Elements:**
 - `elements.triangle` - The base triangle BHM
 - `elements.baseTriangleTextElement` - The text element for the base triangle area
+
+## File Dependencies
+
+```
+HTML File
+├── script.js (global utilities)
+├── 2024_II_17_utils.js (specific utilities)
+└── 2024_II_17_X.js (your specific code)
+```

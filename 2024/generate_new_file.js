@@ -35,6 +35,7 @@ const htmlTemplate = `<!DOCTYPE html>
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../script.js"></script>
+    <script src="2024_II_17_utils.js"></script>
     <script src="2024_II_17_${version}.js"></script>
 </body>
 
