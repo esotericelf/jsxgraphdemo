@@ -112,7 +112,6 @@ const angleAPD = board.create('angle', [A, P, D], {
     fillOpacity: 1,
     label: false,
     name: '',
-    visible: false
 });
 
 // Animation sequence
