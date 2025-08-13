@@ -164,3 +164,241 @@ const createPolygon = (points, attributes = {}) => {
     ...attributes                                     // User args OVERRIDE defaults
   });
 };
+
+
+/**
+ * Creates a line through two points with properly formatted equation
+ * @param {JXG.Point} A - First point
+ * @param {JXG.Point} B - Second point
+ * @param {Object} options - JSXGraph line options
+ * @returns {Object} An object containing the line and its equation element
+ */
+function createLineWithEquation(board, A, B, options, onUpdateCallback) {
+  // Default options merged with user options
+  const lineOptions = Object.assign({
+    strokeColor: '#000000',
+    strokeWidth: 2,
+    highlightStrokeColor: '#FF0000',
+    highlightStrokeWidth: 3,
+    label: { autoPosition: true }
+  }, options || {});
+
+  // Create the line
+  const line = board.create('line', [A, B], lineOptions);
+
+  // Calculate the coefficients for ax + by + c = 0
+  const x1 = A.X(), y1 = A.Y();
+  const x2 = B.X(), y2 = B.Y();
+
+  // Calculate the coefficients
+  let a = y1 - y2;
+  let b = x2 - x1;
+  let c = x1 * y2 - x2 * y1;
+
+  // Compute the greatest common divisor using Euclidean algorithm
+  const gcd = (a, b) => {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) {
+      const temp = b;
+      b = a % b;
+      a = temp;
+    }
+    return a;
+  };
+
+  const gcd3 = (a, b, c) => {
+    return gcd(gcd(a, b), c);
+  };
+
+  const commonDivisor = gcd3(a, b, c);
+
+  // Simplify coefficients by dividing by GCD
+  a = a / commonDivisor;
+  b = b / commonDivisor;
+  c = c / commonDivisor;
+
+  // Ensure the leading coefficient is positive
+  if (a < 0 || (a === 0 && b < 0)) {
+    a = -a;
+    b = -b;
+    c = -c;
+  }
+
+  // Format the equation string
+  let equationStr = '';
+
+  // Handle 'a' coefficient
+  if (a !== 0) {
+    if (a === 1) equationStr += 'x';
+    else if (a === -1) equationStr += '-x';
+    else equationStr += a + 'x';
+  }
+
+  // Handle 'b' coefficient
+  if (b !== 0) {
+    let bPart = '';
+    if (b === 1) bPart = '+y';
+    else if (b === -1) bPart = '-y';
+    else bPart = (b > 0 ? '+' : '') + b + 'y';
+
+    // Special case when a is 0
+    if (a === 0) bPart = bPart.replace(/^\+/, '');
+    equationStr += bPart;
+  }
+
+  // Handle 'c' coefficient
+  if (c !== 0 || (a === 0 && b === 0)) {
+    equationStr += (c > 0 ? '+' : '') + c;
+  }
+
+  // Add the =0 part
+  equationStr += '=0';
+
+  // Clean up any remaining +- or double signs
+  equationStr = equationStr.replace(/\+\-/g, '-').replace(/\-\-/g, '+');
+
+  // Create the equation label with proper MathJax formatting
+  const equation = board.create('text', [
+    function () { return A.X() + (B.X() - A.X()) * 0.1; },
+    function () { return A.Y() + (B.Y() - A.Y()) * 0.1; },
+    '$$' + equationStr + '$$'
+  ], {
+    anchorX: 'left',
+    anchorY: 'bottom',
+    fontSize: 16,
+    useMathJax: true,
+    parse: false
+  });
+
+  // Function to update equation when points are dragged
+  const updateEquation = () => {
+    const x1 = A.X(), y1 = A.Y();
+    const x2 = B.X(), y2 = B.Y();
+
+    let a = y1 - y2;
+    let b = x2 - x1;
+    let c = x1 * y2 - x2 * y1;
+
+    // GCD calculation
+    const gcd = (a, b) => {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b !== 0) {
+        const temp = b;
+        b = a % b;
+        a = temp;
+      }
+      return a;
+    };
+
+    const gcd3 = (a, b, c) => gcd(gcd(a, b), c);
+    const commonDivisor = gcd3(a, b, c);
+
+    a = a / commonDivisor;
+    b = b / commonDivisor;
+    c = c / commonDivisor;
+
+    if (a < 0 || (a === 0 && b < 0)) {
+      a = -a;
+      b = -b;
+      c = -c;
+    }
+
+    let equationStr = '';
+    if (a !== 0) {
+      if (a === 1) equationStr += 'x';
+      else if (a === -1) equationStr += '-x';
+      else equationStr += a + 'x';
+    }
+    if (b !== 0) {
+      let bPart = '';
+      if (b === 1) bPart = '+y';
+      else if (b === -1) bPart = '-y';
+      else bPart = (b > 0 ? '+' : '') + b + 'y';
+      if (a === 0) bPart = bPart.replace(/^\+/, '');
+      equationStr += bPart;
+    }
+    if (c !== 0 || (a === 0 && b === 0)) {
+      equationStr += (c > 0 ? '+' : '') + c;
+    }
+    equationStr += '=0';
+    equationStr = equationStr.replace(/\+\-/g, '-').replace(/\-\-/g, '+');
+
+    equation.setText('$$' + equationStr + '$$');
+
+    // Update stored values
+    result.coefficients = { a: a, b: b, c: c };
+    result.equationText = equationStr;
+
+    // Call external callback if provided
+    if (onUpdateCallback && typeof onUpdateCallback === 'function') {
+      onUpdateCallback({ a: a, b: b, c: c, equationText: equationStr });
+    }
+
+    return { a: a, b: b, c: c, equationText: equationStr };
+  };
+
+  // Set up update listener
+  board.on('update', updateEquation);
+
+  const result = {
+    line: line,
+    equation: equation,
+    coefficients: { a: a, b: b, c: c },
+    equationText: equationStr,
+    updateEquation: updateEquation,
+    getCoefficients: () => result.coefficients,
+    getEquationText: () => result.equationText
+  };
+
+  return result;
+}
+
+/**
+ * Creates a MathJax label showing point coordinates
+ * @param {JXG.Board} board - The JSXGraph board
+ * @param {JXG.Point} P - The point to label
+ * @param {Object} options - Styling options for the label
+ * @returns {Object} An object containing the label element
+ */
+function labelPoint(board, P, options) {
+  // Default options merged with user options
+  const labelOptions = Object.assign({
+    fontSize: 14,
+    anchorX: 'left',
+    anchorY: 'bottom',
+    offset: [0.1, 0.1],  // Default offset of 0.1 units in each direction
+    useMathJax: true,
+    parse: false
+  }, options || {});
+
+  // Calculate offset relative to board coordinate system
+  const boardWidth = board.getBoundingBox()[2] - board.getBoundingBox()[0];
+  const boardHeight = board.getBoundingBox()[1] - board.getBoundingBox()[3];
+  const xOffset = labelOptions.offset[0] * boardWidth * 0.01; // 1% of board width
+  const yOffset = labelOptions.offset[1] * boardHeight * 0.01; // 1% of board height
+
+  // Create the coordinate label with MathJax formatting
+  const label = board.create('text', [
+    function () { return P.X() + xOffset; },
+    function () { return P.Y() + yOffset; },
+    `$$(${P.X()}, ${P.Y()})$$`
+  ], labelOptions);
+
+  // Function to update label when point moves
+  const updateLabel = () => {
+    label.setText(`$$(${P.X()}, ${P.Y()})$$`);
+  };
+
+  // Set up update listener
+  board.on('update', updateLabel);
+
+  const result = {
+    label: label,
+    updateLabel: updateLabel,
+    getCoordinates: () => ({ x: P.X(), y: P.Y() })
+  };
+
+  return result;
+}
