@@ -45,21 +45,42 @@ const createCircle = (o, r, n) => {
 }
 
 //p,q,r are three points object and n is the name, if showangle is true, value is displayed instead of angle
-const createAngle = (p, q, r, n, showangle) => {
-  return board.create('nonreflexangle', [p, q, r], {
-    strokeColor: '#00ff00', strokeWidth: 1, radius: 0.5, color: '#F5479E', fillOpacity: 0.5, name: function () {
+//options parameter allows overriding default values (e.g., {radius: 1, fillOpacity: 0.8})
+const createAngle = (p, q, r, n, showangle, options = {}) => {
+  const defaultOptions = {
+    strokeColor: '#00ff00',
+    strokeWidth: 1,
+    radius: 0.5,
+    color: '#F5479E',
+    fillOpacity: 0.5,
+    name: function () {
       if (showangle) {
         if (JXG.Math.Geometry.trueAngle(p, q, r) > 180) { return 360 - JXG.Math.Geometry.trueAngle(p, q, r).toFixed(0) + '°'; }
         else { return JXG.Math.Geometry.trueAngle(p, q, r).toFixed(0) + '°'; }
       }
       else { return n }
+    },
+    label: {
+      position: 'top',
+      offset: [0, 2]
     }
-  })
+  };
+
+  // Merge default options with user-provided options
+  const finalOptions = Object.assign({}, defaultOptions, options);
+
+  return board.create('nonreflexangle', [p, q, r], finalOptions);
 }
 
 //p is the function in text, left and right are the starting and ending boundary, n is the name
-const createGraph = (p, left, right, n) => {
-  return board.create('functiongraph', [p, left, right], { strokeColor: 'black', strokeWidth: 2, fixed: false, name: n });
+const createGraph = (p, left, right, n, attributes = {}) => {
+  return board.create('functiongraph', [p, left, right], {
+    strokeColor: 'black',
+    strokeWidth: 2,
+    fixed: false,
+    name: n,
+    ...attributes
+  });
 }
 
 //x, y are the position of the text, tx are the text, fs is the fontsize, mj is the boolean of whether mathjax applies
